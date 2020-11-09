@@ -39,7 +39,20 @@ print('오늘 점심메뉴 많이 고민 되시죠?\n',total_menu_df)
 
 choice_menu = input('1~5번중에 어떤 메뉴가 마음에 드시나요? 번호를 입력해주세요.')
 choosen_res = random_menu_df.loc[int(choice_menu)][0:]
-print(choosen_res[0],'을 선택하셨군요?')
-search_res = choosen_res[0] #추후 검색에 이용할 식당 상호명
+print(choosen_res[0],'을 선택하셨군요?\n학원에서 식당까지 가는 길을 알려드릴게요. 잠시만요')
+search_res = choosen_res[0] # 추후 검색에 이용할 식당 상호명
 search_ad = choosen_res['주소'] # 추후 검색에 이용할 주소
 
+#------ 지도 보여주기-----
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+driver = webdriver.Chrome('c:/chromedriver.exe')
+url = 'https://map.naver.com/v5/directions/14139877.295363877,4507130.702141138,%ED%94%8C%EB%A0%88%EC%9D%B4%EB%8D%B0%EC%9D%B4%ED%84%B0,1445764215,PLACE_POI/-/-/walk?c=14139868.3907171,4507084.3705823,18,0,0,0,dh'
+
+driver.implicitly_wait(3)
+
+driver.get(url)
+search_ad_in_map = driver.find_element_by_xpath('//*[@id="directionGoal1"]').send_keys(search_ad,(Keys.ENTER))
+button = driver.find_element_by_xpath('//*[@id="container"]/shrinkable-layout/div/directions-layout/directions-result/div[1]/directions-search-list/search-list/search-list-contents/perfect-scrollbar/div/div[1]/div/div/div/search-item-address/div/div[1]/button/span')
+button.click()
+#driver.find_element_by_button('div > btn.btn_direction.active').click()
