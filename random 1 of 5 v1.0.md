@@ -40,6 +40,6 @@ print('오늘 점심메뉴 많이 고민 되시죠?\n',total_menu_df)
 choice_menu = input('1~5번중에 어떤 메뉴가 마음에 드시나요? 번호를 입력해주세요.')
 choosen_res = random_menu_df.loc[int(choice_menu)][0:]
 print(choosen_res[0],'을 선택하셨군요?')
-search_res = choosen_res[0] # 추후 검색에 이용할 식당 상호명
+search_res = choosen_res[0] #추후 검색에 이용할 식당 상호명
 search_ad = choosen_res['주소'] # 추후 검색에 이용할 주소
 
