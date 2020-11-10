@@ -13,27 +13,32 @@ total_menu = []
 #----한식 뽑기-----
 sheet_k = wb.worksheet('korean')
 data_k = pd.DataFrame(sheet_k.get_all_values(),)
+data_k = data_k[1:(len(data_k)+1)]
 ran_k = data_k.sample()
 total_menu.append(ran_k)
 
 #----중식 뽑기-----
 sheet_c = wb.worksheet('chinese')
 data_c = pd.DataFrame(sheet_c.get_all_values(),)
+data_c = data_c[1:(len(data_c)+1)]
 ran_c = data_c.sample()
 total_menu.append(ran_c)
 #----일식 뽑기-----
 sheet_j = wb.worksheet('japanese')
 data_j = pd.DataFrame(sheet_j.get_all_values(),)
+data_j = data_j[1:(len(data_j)+1)]
 ran_j = data_j.sample()
 total_menu.append(ran_j)
 #----분식 뽑기-----
 sheet_s = wb.worksheet('simple_meal')
 data_s = pd.DataFrame(sheet_s.get_all_values(),)
+data_s = data_s[1:(len(data_s)+1)]
 ran_s = data_s.sample()
 total_menu.append(ran_s)
 #----학원생 추천 뽑기-----
 sheet_m = wb.worksheet('member')
 data_m = pd.DataFrame(sheet_m.get_all_values(),)
+data_m = data_m[1:(len(data_m)+1)]
 ran_m = data_m.sample()
 total_menu.append(ran_m)
 print(total_menu)
