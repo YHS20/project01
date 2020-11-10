@@ -41,8 +41,10 @@ data_m = pd.DataFrame(sheet_m.get_all_values(),)
 data_m = data_m[1:(len(data_m)+1)]
 ran_m = data_m.sample()
 total_menu.append(ran_m)
-print(total_menu)
-#---- 랜덤으로 뽑은 메뉴 하나로 합치기
 
-lunch_columns = ['식당이름','대표 메뉴','평점','리뷰','주소']
-#lunch_index = []
+#---- 랜덤으로 뽑은 메뉴 하나로 합치기
+lunch_columns = ['가게 이름','대표 메뉴','평점','후기','주소']
+lunch_index = {0:'한식 추천', 1: '중식 추천',2:'일식 추천',3:'분식 추천',4:'학원생 추천'}
+df_total_menu = pd.DataFrame(total_menu, columns = lunch_columns, index = lunch_index)
+#total_menu.rename(columns = lunch_columns, index = lunch_index, inplace = True)
+# DataFrame 만들 때 index 랑  columns를 정해서 만들자.
