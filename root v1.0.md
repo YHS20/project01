@@ -14,3 +14,9 @@ button.click()
 driver.find_element_by_xpath('//*[@id="container"]/shrinkable-layout/div/directions-layout/directions-result/div[1]/directions-summary-list/directions-hover-scroll/div/div/directions-summary-item-walking/div[3]/button').click()
 
 #driver.find_element_by_button('div > btn.btn_direction.active').click() # 가는 길 상세하게 보여주기
+
+df
+gsdf
+gsd
+fg
+sdfg
