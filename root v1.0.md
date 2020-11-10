@@ -11,4 +11,6 @@ driver.get(url)
 search_ad_in_map = driver.find_element_by_xpath('//*[@id="directionGoal1"]').send_keys(search_ad,(Keys.ENTER))
 button = driver.find_element_by_xpath('//*[@id="container"]/shrinkable-layout/div/directions-layout/directions-result/div[1]/directions-search-list/search-list/search-list-contents/perfect-scrollbar/div/div[1]/div/div/div/search-item-address/div/div[1]/button/span')
 button.click()
-#driver.find_element_by_button('div > btn.btn_direction.active').click()
+driver.find_element_by_xpath('//*[@id="container"]/shrinkable-layout/div/directions-layout/directions-result/div[1]/directions-summary-list/directions-hover-scroll/div/div/directions-summary-item-walking/div[3]/button').click()
+
+#driver.find_element_by_button('div > btn.btn_direction.active').click() # 가는 길 상세하게 보여주기
