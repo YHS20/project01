@@ -1,0 +1,97 @@
+#네이버지도v4크롤링
+##### 엑셀저장 전 전처리 크롤링1(주피터검퓨터ver) #####
+## 전처리1-1 식당상호명,식당url,이미지url 크롤링하기 ##
+
+# 라이브러리 불러오기
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+driver = webdriver.Chrome("c:/chromedriver.exe")
+
+# 네이버지도v4 창열기
+url ="https://v4.map.naver.com"
+driver.get(url)
+driver.find_elements_by_css_selector("button.btn_close")[1].click()
+search_box = driver.find_element_by_css_selector("input#search-input")
+
+# 네이버지도v4에서 식당검색
+# 검색할 식당 리스트 생성(내용 바꿀 수 있음ex.남부터미널역 한식 맛집)
+list = ["효령로 한식 맛집","효령로 양식 맛집","효령로 일식 맛집","효령로 중식 맛집","효령로 분식 맛집"]
+# for구문을 이용하여 list 요소들을 하나씩 검색하기
+for a in list:
+    search_box.send_keys(a)
+    search_button = driver.find_element_by_css_selector("button.spm")
+    search_button.click()
+    print("----------"+a+"----------") # 다음 식당을 크롤링 할때 가독성을 위한 구분선
+    
+    # 다음페이지 넘기기 범위
+    for b in range(2,6):
+        stores = driver.find_elements_by_css_selector("div.lsnx")
+        
+        
+        # 식당상호명,url,이미지 범위 찾기
+        for store in stores:
+            name = store.find_element_by_css_selector("dt > a").text # 식당상호명
+            siteview = store.find_element_by_css_selector("span.ico") # 식당url정보가 들어있는 범위
+            siteview_text = siteview.text # text로 변환
+            image = store.find_element_by_css_selector("div > img") # 이미지url
+            
+            # 식당상호명,url,이미지 추출
+            try:
+                a_tag = siteview.find_element_by_css_selector("div.lsnx > dl > dt > span > a") # 식당 url이 들어있는 태그
+                href = a_tag.get_attribute('href') # href값 추출
+                src = image.get_attribute('src') # 이미지가 들어있는 src값 추출
+                if "가격" in siteview_text: 
+                    print(name,"url: "+href,"image: "+src,sep=" / ") 
+                if "가격" not in siteview_text:
+                    print(name,"None") 
+            except: 
+                print(name,"주소없음") 
+        
+        # 다음페이지 넘기기 클릭
+        try:
+            page_bar = driver.find_elements_by_css_selector("div.paginate > *") # 다음페이지 버튼
+            if b%5 !=0: 
+                page_bar[b].click() 
+                time.sleep(1)
+        except: 
+            break
+            
+            
+    search_box.clear() # 다음 식당검색을 위해 검색창 초기화
+	
+	
+##### 엑셀저장전 전처리 크롤링2(주피터컴퓨터ver) #####
+## 전처리1-2 식당정보,리뷰,별점 크롤링(전처리1-1 식당url을 활용) ##
+
+# 라이브러리 불러오기
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+driver = webdriver.Chrome("c:/chromedriver.exe")
+
+# 전처리1-1에서 크롤링한 식당url을 활용하여 식당상세 페이지 들어가기
+url1 = "https://store.naver.com/restaurants/detail?id=" # 네이버플레이스 주소
+url2 = "11819292" # 식당 고유번호
+driver.get(url1 + url2) # 고유번호에 해당하는 식당상세페이지
+
+# 리뷰페이지 클릭
+driver.find_element_by_css_selector("div.sc_box a.btn_sc_more").click()
+
+# 식당상호명,주소,카테고리 크롤링(전처리1-1의 결과와 병합하기 위해 식당상호명 다시 크롤링함)
+name = driver.find_element_by_css_selector("strong.name").text # 식당상호명
+add = driver.find_element_by_css_selector("span.addr").text # 식당주소
+cate = driver.find_element_by_css_selector("span.category").text # 식당카테고리(ex.한식)
+print(name,add,cate,sep=' / ')
+
+# 별점 크롤링
+star_list = driver.find_elements_by_css_selector("span.score") # 별점데이터를 갖고있는 범위 찾기
+for star in star_list: # 찾은 별점데이터들의 요소들을 하나씩 꺼내기
+    star_text = star.text # 각 별점데이터 요소들을 text화
+    print("별점 :"+star_text) # text화된 별점값 출력
+    
+# 리뷰 크롤링
+review_list = driver.find_elements_by_css_selector("div.review_txt") # 리뷰데이터를 갖고있는 범위 찾기
+for review in review_list: # 찾은 리뷰데이터들의 요소들을 하나씩 꺼내기
+    review_text = review.text # 각 리뷰데이터 요소들을 text화
+    print("리뷰 :"+review_text) # text화된 리뷰값 출력

@@ -1,0 +1,190 @@
+# 1.네이버 플레이스 맛집 상호, 메뉴, 주소 크롤링
+#### 네이버 플레이스 맛집 상호,메뉴,주소 검색 크롤링 코드 ####
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import pandas as pd
+import openpyxl
+import time
+
+wb = openpyxl.Workbook()
+driver = webdriver.Chrome("c:/chromedriver.exe")
+driver.get("https://v4.map.naver.com")
+driver.find_elements_by_css_selector("button.btn_close")[1].click() #웹페이지 팝업 닫기
+search_box = driver.find_element_by_css_selector("input#search-input") #List 값 받아서 넣기
+
+Titles = []
+menus = []
+adrrs = []
+sheet = wb.active
+sheet.append(["Title", "menu", "address"])
+
+list = ["효령로 한식 맛집","효령로 일식 맛집","효령로 분식 맛집","효령로 중식 맛집"]
+for a in list: #네이버 검색창 클릭 및 검색 시작
+    search_box.send_keys(a) 
+    search_button = driver.find_element_by_css_selector("button.spm")
+    search_button.click() # 검색 버튼 클릭
+    print("--------------"+ a +"---------------")
+    time.sleep(2) #2초간 지연
+    
+    ##### 식당 정보 검색 #####
+    for n in range(2, 8): #네이버 플레이스 웹페이지 html 식당정보 리스트 코드
+        stores = driver.find_elements_by_css_selector("div.lsnx")
+        
+        for store in stores: #html 코드에사 가게 정보 크롤징
+            Title = store.find_element_by_css_selector("dt > a").text #상호
+            menu = store.find_element_by_css_selector("dd.cate").text #메뉴
+            addr = store.find_element_by_css_selector("dd.addr").text #주소
+            print(Title) #상호,메뉴,주소 결과 출력
+            print(menu)
+            print(addr)
+            sheet.append([Title, menu, addr]) #받아서 엑셀 데이터 넣기
+            
+        page_bar = driver.find_elements_by_css_selector('div.paginate > *')  #페이지 넘기기
+        try: # 예외 처리 중 꼭 실행하는 코드
+            if n%5 != 0:
+                page_bar[n%5+1].click()
+            else:
+                page_bar[6].click()
+        except:
+            print("-------------- 수집완료 --------------")
+            break
+        time.sleep(2) #2초간 지연
+        search_box.clear() #검색창 초기화
+
+print("---------------- 검색이 끝났습니다. -----------------")
+driver.quit() #페이지 종료        
+wb.save("data1.xlsx") # 데이터 저장
+
+# 2. 네이버 맛집 상호, 별점 크롤링
+##### 네이버 맛집 별점 자동크롤링 코드 #####
+import time
+import requests
+import openpyxl
+import pandas as pd
+from selenium import webdriver
+from bs4 import BeautifulSoup
+
+wb = openpyxl.Workbook()
+url = 'https://www.naver.com/'
+driver = webdriver.Chrome('c:\chromedriver.exe')
+driver.get(url)
+
+Titles = []
+score_stars = []
+sheet = wb.active
+sheet.append(["Title", "score_star"])
+
+##### 네이버 검색 페이지 #####
+search_box = driver.find_element_by_css_selector("input#query") # 검색창 마우스 클릭
+search_box.send_keys('효령로 맛집') # 원하는 검색어 입력
+driver.find_element_by_xpath('//*[@id="search_btn"]').click() # 검색어 클릭
+
+print("---------------- 검색 중입니다. -----------------")
+
+time.sleep(1)
+
+##### 한식 메뉴 검색 #####
+for i in range(10):
+    stores = driver.find_elements_by_css_selector("div.list_item_inner")
+    time.sleep(1)
+    for store in stores:
+        Title = store.find_element_by_css_selector(".name span").text
+        try: # 예외 처리 중 꼭 실행하는 코드
+            score_star = store.find_element_by_css_selector("span.rating").text
+        except: # 별점이 없을 경우 None으로 데이터 값 받기
+            score_star = "None"
+
+        print(Title)
+        print(score_star)
+        sheet.append([Title, score_star]) #엑셀 시트에 상호와 별점 데이터 받기
+        
+    time.sleep(2)
+    #다음페이지 넘기기
+    search_button = driver.find_element_by_css_selector("#place_main_ct > div > section:nth-child(1) > div > div.place_list > div.list_area > div > a.spnew_bf.cmm_pg_next.on").click()
+    time.sleep(1)
+
+print("------------------ 검색이 끝났습니다. -------------------")
+time.sleep(2)
+driver.quit() #페이지 종료
+wb.save("data2.xlsx") #엑셀 데이터 저장
+
+# 3.네이버 플레이스 상호, URL 크롤링 (혜수씨 코드에 엑셀 저장 추가)
+#### 엑셀저장전 전처리 크롤링1 #####
+### 전처리1-1 식당상호명,url,이미지url ###
+###혜수님 코드에 엑셀저장 되도록 수정함###
+
+# 라이브러리 불러오기
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
+driver = webdriver.Chrome("c:/chromedriver.exe")
+# 네이버지도v4 창열기
+url ="https://v4.map.naver.com"
+driver.get(url)
+# 네이버지도v4에서 식당검색
+driver.find_elements_by_css_selector("button.btn_close")[1].click()
+search_box = driver.find_element_by_css_selector("input#search-input")
+list = ["효령로 한식 맛집","효령로 양식 맛집","효령로 일식 맛집","효령로 중식 맛집","효령로 분식 맛집"]
+for a in list:
+    search_box.send_keys(a)
+    search_button = driver.find_element_by_css_selector("button.spm")
+    search_button.click()
+    print("----------"+a+"----------")
+    # 페이지 자동 넘기기 범위 지정
+    for b in range(2,6):
+        stores = driver.find_elements_by_css_selector("div.lsnx")
+        # 식당상호명,url,이미지 범위 지정
+        for store in stores:
+            name = store.find_element_by_css_selector("dt > a").text
+            siteview = store.find_element_by_css_selector("span.ico")
+            siteview_text = siteview.text
+            image = store.find_element_by_css_selector("div > img")
+            # 식당상호명,url,이미지 추출
+            try:
+                src = image.get_attribute('src')
+                a_tag = siteview.find_element_by_css_selector("div.lsnx > dl > dt > span > a")
+                href = a_tag.get_attribute('href')
+                if "가격" in siteview_text:
+                    print(name,"url: "+href,"image: "+src,sep=" / ")
+                if "가격" not in siteview_text:
+                    print(name,"None")
+                Titles.append(Title)             # 엑셀 시트 1번 Title 값을 넣기
+                score_stars.append(score_stars)  #엑셀 시트 2번 score_stars 값을 넣기
+            except:
+                print(name,"주소없음")
+        try:
+            page_bar = driver.find_elements_by_css_selector("div.paginate > *")
+            if b%5 !=0:
+                page_bar[b].click()
+                time.sleep(1)
+        except:
+            break
+    search_box.clear()
+
+print("---------------- 검색이 끝났습니다. -----------------")
+data = pd.DataFrame({"Title":Titles, "URL":href}) #판다스 데이터 프레임에 저장
+data.to_excel("data3.xlsx") # 데이터 저장
+
+# 4.네이버 플레이스 크롤링 엑셀 1,2,3번 파일 병합하기
+###### 네이버 맛집 크롤링 엑셀파일 병합 및 중복 제거 코드 ######
+import xlsxwriter as xw
+import pandas as pd
+import openpyxl
+import glob
+
+store_list1 = pd.read_excel('data2.xlsx') #상호,별점 크롤링 파일 읽기
+store_list2 = pd.read_excel('data1.xlsx') #상호,메뉴,주소 크롤링 파일 읽기
+store_list3 = pd.read_excel('data3.xlsx') #상호,URL 크롤링 파일 읽기
+print("파일 읽기 완료")
+
+#엑셀 파일을 Title을 기준으로 두 파일을 합치기
+store_list4 = pd.merge(store_list1,store_list2, on='Title',how='inner')
+# print(store_list4) #결과 확인
+store_list5 = pd.merge(store_list4,store_list3, on='Title',how='inner')
+# print(store_list5) #결과 확인
+print("파일 병합 완료")
+
+# store_list = pd.DataFrame(store_list5) #데이터 프레임 상태로 변경
+store_list.drop_duplicates(subset=['Title']) #데이터 프레임에서 Title 열에 중복값 제거
+store_list.to_excel('store_list.xlsx') #합쳐진 파일을 엑셀파일로 저장
+print("저장이 완료 되었습니다.")
